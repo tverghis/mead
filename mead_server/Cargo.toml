@@ -3,5 +3,5 @@ name = "mead_server"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
+[target.'cfg(all(target_os="linux", target_arch="x86_64"))'.dependencies]
 libbpf-rs = "0.23.3"
