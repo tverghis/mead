@@ -1,0 +1,3 @@
+[workspace]
+members = ["mead_server"]
+resolver = "2"
