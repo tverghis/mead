@@ -1,4 +1,4 @@
-use libbpf_rs::query::ProfInfoIter;
+use libbpf_rs::query::ProgInfoIter;
 
 fn main() {
     let mut iter = ProgInfoIter::default();
