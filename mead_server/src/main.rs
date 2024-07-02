@@ -1,8 +1,8 @@
-use libbpf_rs::query::ProgInfoIter;
+use libbpf_rs::query::{ProgInfoIter, ProgInfoQueryOptions};
 
 fn main() {
-    let mut iter = ProgInfoIter::default();
+    let iter = ProgInfoIter::with_query_opts(ProgInfoQueryOptions::default().include_all());
     for prog in iter {
-        println!("{}", prog.name.to_string_lossy());
+        println!("{} (type: {})", prog.name.to_string_lossy(), prog.ty);
     }
 }
