@@ -3,5 +3,7 @@ name = "mead_server"
 version = "0.1.0"
 edition = "2021"
 
-[target.'cfg(all(target_os="linux", target_arch="x86_64"))'.dependencies]
+[dependencies]
+axum = "0.7.5"
 libbpf-rs = "0.23.3"
+tokio = { version = "1.38.0", features = ["full"] }
