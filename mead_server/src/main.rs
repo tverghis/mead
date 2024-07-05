@@ -1,12 +1,26 @@
-use libbpf_rs::query::{ProgInfoIter, ProgInfoQueryOptions};
+use axum::{routing::get, Json, Router};
+use libbpf_rs::query::ProgInfoIter;
+use mead_server::responses::ProgInfoResponse;
 
-fn main() {
-    do_main();
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/ping", get(ping_handler))
+        .route("/prog_info", get(get_ebpf_programs));
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    println!("Listening on port 3000!");
+    axum::serve(listener, app).await.unwrap();
 }
 
-fn do_main() {
-    let iter = ProgInfoIter::with_query_opts(ProgInfoQueryOptions::default().include_all());
-    for prog in iter {
-        println!("{} (type: {})", prog.name.to_string_lossy(), prog.ty);
-    }
+async fn ping_handler() -> &'static str {
+    "Pong!"
+}
+
+async fn get_ebpf_programs() -> Json<Vec<ProgInfoResponse>> {
+    Json(
+        ProgInfoIter::default()
+            .map(ProgInfoResponse::from)
+            .collect(),
+    )
 }
