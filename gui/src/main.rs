@@ -20,6 +20,7 @@ fn main() {
 struct MeadApp {
     signal_tx: Sender<UpdateSignal>,
     state: Arc<Mutex<State>>,
+    selected_prog_id: Option<u32>,
 }
 
 impl MeadApp {
@@ -29,7 +30,11 @@ impl MeadApp {
         let ctx = cc.egui_ctx.clone();
         let (signal_tx, signal_rx) = mpsc::channel();
         let signal_proc = SignalProcessor::new(signal_rx);
-        let state = Arc::new(Mutex::new(State::new()));
+        let state_inner = State::new_from_api();
+
+        let first_prog_id = state_inner.prog_infos.first().map(|i| i.id);
+
+        let state = Arc::new(Mutex::new(state_inner));
 
         let state_clone = state.clone();
 
@@ -37,21 +42,33 @@ impl MeadApp {
             signal_proc.start(&ctx, state_clone);
         });
 
-        Self { signal_tx, state }
+        Self {
+            signal_tx,
+            state,
+            selected_prog_id: first_prog_id,
+        }
     }
 }
 
 impl eframe::App for MeadApp {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            let s = self.state.lock().unwrap();
+
             if ui.button("Click").clicked() {
                 self.signal_tx.send(UpdateSignal::AllProgramInfo).unwrap();
             }
 
-            let s = self.state.lock().unwrap();
-
             for info in s.prog_infos.iter() {
-                ui.label(&info.name);
+                if ui
+                    .selectable_label(
+                        self.selected_prog_id == Some(info.id),
+                        format!("{}: {}", info.id, info.name),
+                    )
+                    .clicked()
+                {
+                    self.selected_prog_id = Some(info.id);
+                }
             }
         });
     }

@@ -6,6 +6,7 @@ pub struct ProgInfoResponse {
     pub name: String,
     #[serde(rename = "type")]
     pub ty: String,
+    pub id: u32,
 }
 
 impl From<ProgramInfo> for ProgInfoResponse {
@@ -13,6 +14,7 @@ impl From<ProgramInfo> for ProgInfoResponse {
         Self {
             name: info.name.to_string_lossy().to_string(),
             ty: info.ty.to_string(),
+            id: info.id,
         }
     }
 }
