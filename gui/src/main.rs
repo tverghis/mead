@@ -6,7 +6,9 @@ use std::{
     thread,
 };
 
-use eframe::egui::{self, FontData, FontDefinitions, FontFamily, FontId, TextStyle};
+use eframe::egui::{
+    self, Color32, FontData, FontDefinitions, FontFamily, FontId, Rounding, TextStyle,
+};
 use gui::{
     signals::{SignalProcessor, UpdateSignal},
     state::State,
@@ -26,6 +28,7 @@ struct MeadApp {
 impl MeadApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         setup_fonts(&cc.egui_ctx);
+        setup_widget_styles(&cc.egui_ctx);
 
         let ctx = cc.egui_ctx.clone();
 
@@ -53,7 +56,7 @@ impl MeadApp {
 
 impl eframe::App for MeadApp {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::SidePanel::left("browser_panel").show(ctx, |ui| {
             let s = self.state.lock().unwrap();
 
             if ui.button("Click").clicked() {
@@ -92,12 +95,22 @@ fn setup_fonts(ctx: &egui::Context) {
 
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
-        (TextStyle::Body, FontId::new(9.0, FontFamily::Proportional)),
+        (TextStyle::Body, FontId::new(13.0, FontFamily::Proportional)),
         (
             TextStyle::Button,
-            FontId::new(9.0, FontFamily::Proportional),
+            FontId::new(13.0, FontFamily::Proportional),
         ),
     ]
     .into();
+    style.visuals.override_text_color = Some(Color32::WHITE);
+    ctx.set_style(style);
+}
+
+fn setup_widget_styles(ctx: &egui::Context) {
+    let mut style = (*ctx.style()).clone();
+    style.visuals.widgets.inactive.rounding = Rounding::ZERO;
+    style.visuals.widgets.active.rounding = Rounding::ZERO;
+    style.visuals.widgets.hovered.rounding = Rounding::ZERO;
+    style.visuals.widgets.open.rounding = Rounding::ZERO;
     ctx.set_style(style);
 }
