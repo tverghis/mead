@@ -1,13 +1,9 @@
 use std::{
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        mpsc::{self, Sender},
-        Arc,
-    },
+    sync::mpsc::{self, Sender},
     thread,
 };
 
-use eframe::egui::{self};
+use eframe::egui;
 use gui::signals::UpdateSignal;
 
 fn main() {
@@ -17,24 +13,25 @@ fn main() {
 
 struct MeadApp {
     signal_tx: Sender<UpdateSignal>,
-    counter: Arc<AtomicU64>,
 }
 
 impl MeadApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        let counter: Arc<AtomicU64> = Arc::new(0.into());
-        let counter_clone = counter.clone();
+        let ctx = cc.egui_ctx.clone();
         let (signal_tx, signal_rx) = mpsc::channel();
         thread::spawn(move || loop {
             let signal = signal_rx.recv().unwrap();
             match signal {
                 UpdateSignal::AllProgramInfo => {
-                    println!("Signal received");
-                    counter_clone.fetch_add(1, Ordering::SeqCst);
+                    match ureq::get("http://localhost:3000/ping").call() {
+                        Ok(r) => println!("{}", r.into_string().unwrap()),
+                        Err(e) => println!("{}", e.to_string()),
+                    };
                 }
             }
+            ctx.request_repaint();
         });
-        Self { signal_tx, counter }
+        Self { signal_tx }
     }
 }
 
@@ -44,7 +41,6 @@ impl eframe::App for MeadApp {
             if ui.button("Click").clicked() {
                 self.signal_tx.send(UpdateSignal::AllProgramInfo).unwrap();
             }
-            ui.label(self.counter.load(Ordering::SeqCst).to_string());
         });
     }
 }
