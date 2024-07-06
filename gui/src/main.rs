@@ -4,7 +4,7 @@ use std::{
 };
 
 use eframe::egui;
-use gui::signals::UpdateSignal;
+use gui::signals::{SignalProcessor, UpdateSignal};
 
 fn main() {
     let opts = eframe::NativeOptions::default();
@@ -19,17 +19,9 @@ impl MeadApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let ctx = cc.egui_ctx.clone();
         let (signal_tx, signal_rx) = mpsc::channel();
-        thread::spawn(move || loop {
-            let signal = signal_rx.recv().unwrap();
-            match signal {
-                UpdateSignal::AllProgramInfo => {
-                    match ureq::get("http://localhost:3000/ping").call() {
-                        Ok(r) => println!("{}", r.into_string().unwrap()),
-                        Err(e) => println!("{}", e.to_string()),
-                    };
-                }
-            }
-            ctx.request_repaint();
+        let signal_proc = SignalProcessor::new(signal_rx);
+        thread::spawn(move || {
+            signal_proc.start(&ctx);
         });
         Self { signal_tx }
     }
