@@ -1,5 +1,5 @@
 [workspace]
-members = [ "gui","mead_server"]
+members = [ "gui","mead_server", "schema"]
 resolver = "2"
 
 [workspace.dependencies]

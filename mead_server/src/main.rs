@@ -1,6 +1,6 @@
 use axum::{routing::get, Json, Router};
 use libbpf_rs::query::ProgInfoIter;
-use mead_server::responses::ProgInfoResponse;
+use schema::responses::ProgInfoResponse;
 
 #[tokio::main]
 async fn main() {

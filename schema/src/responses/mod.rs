@@ -1,7 +1,7 @@
 use libbpf_rs::query::ProgramInfo;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProgInfoResponse {
     name: String,
     #[serde(rename = "type")]
