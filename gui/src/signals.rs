@@ -1,7 +1,9 @@
-use std::sync::mpsc::Receiver;
+use std::sync::{mpsc::Receiver, Arc, Mutex};
 
 use eframe::egui;
-use ureq::Response;
+use schema::responses::ProgInfoResponse;
+
+use crate::state::State;
 
 pub enum UpdateSignal {
     AllProgramInfo,
@@ -15,7 +17,7 @@ impl SignalProcessor {
         Self { rx }
     }
 
-    pub fn start(&self, ctx: &egui::Context) {
+    pub fn start(&self, ctx: &egui::Context, state: Arc<Mutex<State>>) {
         loop {
             // TODO: this will panic if tx is dropped, which happens when the main thread ends.
             // This isn't really a big problem because if the main thread ends, the GUI has exited anyway.
@@ -23,8 +25,11 @@ impl SignalProcessor {
             let signal = self.rx.recv().unwrap();
 
             match signal {
-                UpdateSignal::AllProgramInfo => match send_req() {
-                    Ok(r) => println!("{}", r.into_string().unwrap()),
+                UpdateSignal::AllProgramInfo => match get_prog_infos() {
+                    Ok(resp) => {
+                        let mut s = state.lock().unwrap();
+                        s.prog_infos = resp;
+                    }
                     Err(e) => println!("{e}"),
                 },
             };
@@ -34,6 +39,10 @@ impl SignalProcessor {
     }
 }
 
-fn send_req() -> Result<Response, ureq::Error> {
-    ureq::get("http://localhost:3000/ping").call()
+fn get_prog_infos() -> Result<Vec<ProgInfoResponse>, ureq::Error> {
+    let resp: Vec<ProgInfoResponse> = ureq::get("http://localhost:3000/prog_info")
+        .call()?
+        .into_json()?;
+
+    Ok(resp)
 }

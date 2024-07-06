@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProgInfoResponse {
-    name: String,
+    pub name: String,
     #[serde(rename = "type")]
-    ty: String,
+    pub ty: String,
 }
 
 impl From<ProgramInfo> for ProgInfoResponse {
