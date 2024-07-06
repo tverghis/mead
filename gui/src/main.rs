@@ -56,12 +56,13 @@ impl MeadApp {
 
 impl eframe::App for MeadApp {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        egui::SidePanel::left("browser_panel").show(ctx, |ui| {
-            let s = self.state.lock().unwrap();
-
-            if ui.button("Click").clicked() {
+        egui::TopBottomPanel::bottom("browser_actions_panel").show(ctx, |ui| {
+            if ui.button("Refresh").clicked() {
                 self.signal_tx.send(UpdateSignal::AllProgramInfo).unwrap();
             }
+        });
+        egui::SidePanel::left("browser_panel").show(ctx, |ui| {
+            let s = self.state.lock().unwrap();
 
             for info in s.prog_infos.iter() {
                 if ui
