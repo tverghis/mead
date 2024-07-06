@@ -1,8 +1,8 @@
 use std::sync::{mpsc::Receiver, Arc, Mutex};
 
 use eframe::egui;
-use schema::responses::ProgInfoResponse;
 
+use crate::api_client;
 use crate::state::State;
 
 pub enum UpdateSignal {
@@ -25,7 +25,7 @@ impl SignalProcessor {
             let signal = self.rx.recv().unwrap();
 
             match signal {
-                UpdateSignal::AllProgramInfo => match get_prog_infos() {
+                UpdateSignal::AllProgramInfo => match api_client::get_prog_infos() {
                     Ok(resp) => {
                         let mut s = state.lock().unwrap();
                         s.prog_infos = resp;
@@ -37,12 +37,4 @@ impl SignalProcessor {
             ctx.request_repaint();
         }
     }
-}
-
-fn get_prog_infos() -> Result<Vec<ProgInfoResponse>, ureq::Error> {
-    let resp: Vec<ProgInfoResponse> = ureq::get("http://localhost:3000/prog_info")
-        .call()?
-        .into_json()?;
-
-    Ok(resp)
 }
