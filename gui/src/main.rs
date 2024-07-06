@@ -6,7 +6,7 @@ use std::{
     thread,
 };
 
-use eframe::egui::{self, FontData, FontDefinitions};
+use eframe::egui::{self, FontData, FontDefinitions, FontFamily, FontId, TextStyle};
 use gui::{
     signals::{SignalProcessor, UpdateSignal},
     state::State,
@@ -28,14 +28,15 @@ impl MeadApp {
         setup_fonts(&cc.egui_ctx);
 
         let ctx = cc.egui_ctx.clone();
+
         let (signal_tx, signal_rx) = mpsc::channel();
         let signal_proc = SignalProcessor::new(signal_rx);
+
         let state_inner = State::new_from_api();
 
         let first_prog_id = state_inner.prog_infos.first().map(|i| i.id);
 
         let state = Arc::new(Mutex::new(state_inner));
-
         let state_clone = state.clone();
 
         thread::spawn(move || {
@@ -75,8 +76,8 @@ impl eframe::App for MeadApp {
 }
 
 fn setup_fonts(ctx: &egui::Context) {
-    let proggy_ttf = include_bytes!("../assets/ProggyClean.ttf");
-    let font_name = "proggy_clear";
+    let proggy_ttf = include_bytes!("../assets/ProggyVector-Regular.ttf");
+    let font_name = "proggy";
 
     let mut fonts = FontDefinitions::default();
     fonts
@@ -88,4 +89,15 @@ fn setup_fonts(ctx: &egui::Context) {
         .unwrap()
         .insert(0, font_name.into());
     ctx.set_fonts(fonts);
+
+    let mut style = (*ctx.style()).clone();
+    style.text_styles = [
+        (TextStyle::Body, FontId::new(9.0, FontFamily::Proportional)),
+        (
+            TextStyle::Button,
+            FontId::new(9.0, FontFamily::Proportional),
+        ),
+    ]
+    .into();
+    ctx.set_style(style);
 }
