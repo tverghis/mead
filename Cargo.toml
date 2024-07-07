@@ -1,8 +1,8 @@
 [workspace]
-members = [ "gui","mead_server", "schema"]
+members = ["gui", "mead_server", "schema"]
 resolver = "2"
 
 [workspace.dependencies]
-libbpf-rs = "0.23.3"
+libbpf-rs = { git = "https://github.com/tverghis/libbpf-rs", branch = "pub-tag-inner" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
