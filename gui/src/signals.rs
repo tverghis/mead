@@ -19,19 +19,18 @@ impl SignalProcessor {
 
     pub fn start(&self, ctx: &egui::Context, state: Arc<Mutex<State>>) {
         loop {
-            // TODO: this will panic if tx is dropped, which happens when the main thread ends.
-            // This isn't really a big problem because if the main thread ends, the GUI has exited anyway.
-            // Would be nice to clean this up, though.
-            let signal = self.rx.recv().unwrap();
-
-            match signal {
-                UpdateSignal::AllProgramInfo => match api_client::get_prog_infos() {
+            match self.rx.recv() {
+                Ok(UpdateSignal::AllProgramInfo) => match api_client::get_prog_infos() {
                     Ok(resp) => {
                         let mut s = state.lock().unwrap();
                         s.prog_infos = resp;
                     }
                     Err(e) => println!("{e}"),
                 },
+                _ => {
+                    println!("Exiting SignalProcessor thread");
+                    return;
+                }
             };
 
             ctx.request_repaint();
