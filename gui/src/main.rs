@@ -65,10 +65,14 @@ impl eframe::App for MeadApp {
             let s = self.state.lock().unwrap();
 
             for info in s.prog_infos.iter() {
+                let label_val = match info.name.as_str() {
+                    "" => &info.tag,
+                    _ => &info.name,
+                };
                 if ui
                     .selectable_label(
                         self.selected_prog_id == Some(info.id),
-                        format!("{}: {}", info.id, info.name),
+                        format!("{}: {}", info.id, label_val),
                     )
                     .clicked()
                 {
