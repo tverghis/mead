@@ -8,7 +8,7 @@ pub fn get_prog_infos() -> ApiResult<Vec<ProgInfoResponse>> {
 }
 
 fn api_request<T: DeserializeOwned>(path: &str) -> ApiResult<T> {
-    let url = format!("http://localhost:3000{}", path);
+    let url = format!("http://localhost:3000{path}");
     let resp: T = ureq::get(&url).call()?.into_json()?;
 
     Ok(resp)

@@ -13,7 +13,7 @@ pub struct ProgInfoResponse {
 impl From<ProgramInfo> for ProgInfoResponse {
     fn from(info: ProgramInfo) -> Self {
         // Convert the bytes in .tag to a hex string
-        let tag = info.tag.0.map(|byte| format!("{:02x?}", byte)).join("");
+        let tag = info.tag.0.map(|byte| format!("{byte:02x?}")).join("");
 
         Self {
             name: info.name.to_string_lossy().to_string(),
