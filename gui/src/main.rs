@@ -80,6 +80,34 @@ impl eframe::App for MeadApp {
                 }
             }
         });
+        egui::CentralPanel::default().show(ctx, |ui| {
+            let s = self.state.lock().unwrap();
+            let xlated_insns = s
+                .prog_infos
+                .iter()
+                .find(|info| Some(info.id) == self.selected_prog_id)
+                .map(|info| &info.xlated_insns);
+
+            match xlated_insns {
+                Some(insns) => {
+                    let insns_as_hex_str = insns
+                        .chunks(8)
+                        .map(|w| {
+                            w.iter()
+                                .map(|b| format!("{b:02x}"))
+                                .collect::<Vec<_>>()
+                                .join(" ")
+                        })
+                        .collect::<Vec<_>>();
+                    for i in insns_as_hex_str {
+                        ui.label(i);
+                    }
+                }
+                None => {
+                    ui.label("No instructions");
+                }
+            };
+        });
     }
 }
 

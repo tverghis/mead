@@ -1,5 +1,5 @@
 use axum::{routing::get, Json, Router};
-use libbpf_rs::query::ProgInfoIter;
+use libbpf_rs::query::{ProgInfoIter, ProgInfoQueryOptions};
 use schema::responses::ProgInfoResponse;
 
 #[tokio::main]
@@ -18,8 +18,11 @@ async fn ping_handler() -> &'static str {
 }
 
 async fn get_ebpf_programs() -> Json<Vec<ProgInfoResponse>> {
+    let query_opts = ProgInfoQueryOptions::default()
+        .include_map_ids(true)
+        .include_xlated_prog_insns(true);
     Json(
-        ProgInfoIter::default()
+        ProgInfoIter::with_query_opts(query_opts)
             .map(ProgInfoResponse::from)
             .collect(),
     )

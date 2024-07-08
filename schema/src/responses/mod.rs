@@ -8,6 +8,7 @@ pub struct ProgInfoResponse {
     pub ty: String,
     pub id: u32,
     pub tag: String,
+    pub xlated_insns: Vec<u8>,
 }
 
 impl From<ProgramInfo> for ProgInfoResponse {
@@ -21,6 +22,7 @@ impl From<ProgramInfo> for ProgInfoResponse {
             ty: format!("{:?}", info.ty),
             id: info.id,
             tag,
+            xlated_insns: info.xlated_prog_insns,
         }
     }
 }
