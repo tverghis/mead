@@ -82,12 +82,13 @@ impl eframe::App for MeadApp {
         });
         egui::CentralPanel::default().show(ctx, |ui| {
             ScrollArea::vertical().show(ui, |ui| {
-                let s = self.state.lock().unwrap();
-                let xlated_insns = s
-                    .prog_infos
-                    .iter()
-                    .find(|info| Some(info.id) == self.selected_prog_id)
-                    .map(|info| &info.xlated_insns);
+                let xlated_insns = {
+                    let s = self.state.lock().unwrap();
+                    s.prog_infos
+                        .iter()
+                        .find(|info| Some(info.id) == self.selected_prog_id)
+                        .map(|info| info.xlated_insns.clone())
+                };
 
                 match xlated_insns {
                     Some(insns) => {
