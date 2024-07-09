@@ -23,6 +23,7 @@ struct MeadApp {
     signal_tx: Sender<UpdateSignal>,
     state: Arc<Mutex<State>>,
     selected_prog_id: Option<u32>,
+    selected_insn_idx: Option<usize>,
 }
 
 impl MeadApp {
@@ -50,6 +51,7 @@ impl MeadApp {
             signal_tx,
             state,
             selected_prog_id: first_prog_id,
+            selected_insn_idx: None,
         }
     }
 }
@@ -77,6 +79,7 @@ impl eframe::App for MeadApp {
                     .clicked()
                 {
                     self.selected_prog_id = Some(info.id);
+                    self.selected_insn_idx = None;
                 }
             }
         });
@@ -101,8 +104,13 @@ impl eframe::App for MeadApp {
                                     .join(" ")
                             })
                             .collect::<Vec<_>>();
-                        for i in insns_as_hex_str {
-                            ui.label(i);
+                        for (idx, i) in insns_as_hex_str.iter().enumerate() {
+                            if ui
+                                .selectable_label(Some(idx) == self.selected_insn_idx, i)
+                                .clicked()
+                            {
+                                self.selected_insn_idx = Some(idx);
+                            }
                         }
                     }
                     None => {
