@@ -3,6 +3,7 @@ members = ["gui", "mead_server", "schema"]
 resolver = "2"
 
 [workspace.dependencies]
+# TODO: Revert this to the upstream release once the fix for Tag data lands
 libbpf-rs = { git = "https://github.com/tverghis/libbpf-rs", branch = "pub-tag-inner" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
