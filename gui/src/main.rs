@@ -12,6 +12,7 @@ use eframe::egui::{
 use gui::{
     signals::{SignalProcessor, UpdateSignal},
     state::State,
+    utils::InstructionsHex,
 };
 
 fn main() {
@@ -96,17 +97,15 @@ impl eframe::App for MeadApp {
                 match xlated_insns {
                     Some(insns) => {
                         let insns_as_hex_str = insns
-                            .chunks(8)
-                            .map(|w| {
-                                w.iter()
-                                    .map(|b| format!("{b:02x}"))
-                                    .collect::<Vec<_>>()
-                                    .join(" ")
-                            })
+                            .chunks(8) // TODO: we need to handle wide (ie, 16-byte) instructions
+                            .map(InstructionsHex::from)
                             .collect::<Vec<_>>();
-                        for (idx, i) in insns_as_hex_str.iter().enumerate() {
+                        for (idx, hex) in insns_as_hex_str.iter().enumerate() {
                             if ui
-                                .selectable_label(Some(idx) == self.selected_insn_idx, i)
+                                .selectable_label(
+                                    Some(idx) == self.selected_insn_idx,
+                                    hex.to_string(),
+                                )
                                 .clicked()
                             {
                                 self.selected_insn_idx = Some(idx);
