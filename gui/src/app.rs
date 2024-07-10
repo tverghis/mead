@@ -16,14 +16,14 @@ use eframe::egui::{
     self, Color32, FontData, FontDefinitions, FontFamily, FontId, Rounding, ScrollArea, TextStyle,
 };
 
-pub struct MeadApp {
+pub struct Mead {
     pub signal_tx: Sender<UpdateSignal>,
     pub state: Arc<Mutex<State>>,
     pub selected_prog_id: Option<u32>,
     pub selected_insn_idx: Option<usize>,
 }
 
-impl MeadApp {
+impl Mead {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         setup_fonts(&cc.egui_ctx);
         setup_widget_styles(&cc.egui_ctx);
@@ -53,13 +53,13 @@ impl MeadApp {
     }
 }
 
-impl eframe::App for MeadApp {
+impl eframe::App for Mead {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
         ActionsPanel::new(self).render(ctx);
         egui::SidePanel::left("browser_panel").show(ctx, |ui| {
             let s = self.state.lock().unwrap();
 
-            for info in s.prog_infos.iter() {
+            for info in &s.prog_infos {
                 let label_val = match info.name.as_str() {
                     "" => &info.tag,
                     _ => &info.name,

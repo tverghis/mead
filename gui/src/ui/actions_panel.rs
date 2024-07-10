@@ -1,13 +1,13 @@
-use crate::app::MeadApp;
+use crate::app::Mead;
 use crate::signals::UpdateSignal;
 use eframe::egui::{self, Context};
 
 pub struct ActionsPanel<'a> {
-    state: &'a mut MeadApp,
+    state: &'a mut Mead,
 }
 
 impl<'a> ActionsPanel<'a> {
-    pub fn new(state: &'a mut MeadApp) -> Self {
+    pub fn new(state: &'a mut Mead) -> Self {
         Self { state }
     }
     pub fn render(self, ctx: &Context) {
